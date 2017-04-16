@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour {
+public class GameManager : MonoBehaviour
+{
 
     // カード操作のインターフェース
     public CardManagement cardManage;
@@ -16,6 +17,10 @@ public class GameManager : MonoBehaviour {
     // カード時間
     float cardTime;
 
+    //player
+    private GameObject playerAction;
+
+
     // ゲームの状態
     public enum GameState
     {
@@ -27,13 +32,15 @@ public class GameManager : MonoBehaviour {
     public AudioClip OK;
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         gameState = GameState.SetCard;
+        playerAction = GameObject.Find("unitychan");
+    }
 
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    // Update is called once per frame
+    void Update()
+    {
         // 仮　アクションとカードセットを切り替える
         //if (Input.GetKeyDown(KeyCode.LeftShift))
         //{
@@ -43,9 +50,10 @@ public class GameManager : MonoBehaviour {
         //    audioSource.PlayOneShot(OK);
 
         //}
-       
+
         switch (gameState)
         {
+
             // カードセット時の処理
             case GameState.SetCard:
 
@@ -61,7 +69,14 @@ public class GameManager : MonoBehaviour {
                 cardTime += Time.deltaTime;
                 if (cardTime > CPS)
                 {
-                    GameObject.Find("unitychan").GetComponent<PlayerAction>().ActionPlay(cardManage.ActtionCard(false));
+                    PlayerAction player = playerAction.GetComponent<PlayerAction>();
+                    //プレイヤーがいることを確認
+                    if (player != null)
+                    {
+                        //プレイヤーが地面にいるなら
+                        if (player.IsGround())
+                            GameObject.Find("unitychan").GetComponent<PlayerAction>().ActionPlay(cardManage.ActtionCard(false));
+                    }
                     //cardManage.ActtionCard(false);
                     cardTime = 0.0f;
                 }
