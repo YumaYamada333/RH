@@ -7,6 +7,7 @@ public class Button : MonoBehaviour {
     public GameObject mainCamera;
     public GameObject otherCamera;
     private GameObject ActionBord;
+    private GameObject HandsBord;
     //private GameObject RetuneButton;
     //private GameObject ResetButton;
     private GameObject SpeedButton;
@@ -24,6 +25,7 @@ public class Button : MonoBehaviour {
     {
         otherCamera.SetActive(false);
         ActionBord = GameObject.Find("ActionBord");
+        HandsBord = GameObject.Find("HandsBord");
         //RetuneButton = GameObject.Find("RetuneButton");
         //ResetButton = GameObject.Find("ResetButton");
         SpeedButton = GameObject.Find("SpeedButton");
@@ -42,7 +44,7 @@ public class Button : MonoBehaviour {
         //    SpeedButton.SetActive(false);
         //}
 
-        ActionBord.transform.localPosition= new Vector3(11.0f, 2.0f, 1.0f);
+        ActionBord.transform.localPosition = new Vector3(0.05f, 0.05f, -3.0f);
 
     }
 	
@@ -74,7 +76,9 @@ public class Button : MonoBehaviour {
             //RetuneButton.SetActive(true);
             //ResetButton.SetActive(true);
 
-            ActionBord.transform.localPosition = new Vector3(11.0f, 2.0f, 1.2f);
+            HandsBord.transform.position = new Vector3(1.0f, 1.0f, -10.0f);
+            ActionBord.transform.position = new Vector3(1.0f, 4.0f, -10.0f);
+            //ActionBord.transform.localPosition = new Vector3(11.0f, 2.0f, 1.2f);
             //ActionBord.transform.localPosition += new Vector3(9.0f, 4.5f, 0.2f);
         }
         else
@@ -87,7 +91,7 @@ public class Button : MonoBehaviour {
             //RetuneButton.SetActive(false);
             //ResetButton.SetActive(false);
 
-            ActionBord.transform.localPosition = new Vector3(2.0f, -2.5f, 1.0f);
+            ActionBord.transform.localPosition = new Vector3(0.05f, 0.05f, -3.0f);
             //ActionBord.transform.localPosition -= new Vector3(9.0f, 4.5f, 0.2f);
         }
     }
