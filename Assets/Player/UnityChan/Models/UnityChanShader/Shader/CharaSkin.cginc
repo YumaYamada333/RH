@@ -1,5 +1,3 @@
-// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
-
 // Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
 // Character skin shader
@@ -58,7 +56,7 @@ struct v2f
 v2f vert( appdata_base v )
 {
 	v2f o;
-	o.pos = UnityObjectToClipPos( v.vertex );
+	o.pos = mul( UNITY_MATRIX_MVP, v.vertex );
 	o.uv = TRANSFORM_TEX( v.texcoord.xy, _MainTex );
 	o.normal = normalize( mul( unity_ObjectToWorld, float4_t( v.normal, 0 ) ).xyz );
 	
