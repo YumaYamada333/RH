@@ -286,6 +286,7 @@ public class CardManagement : MonoBehaviour {
                                         bord.TuckCard(tuckCard.front, bord.selectedSpace);
                                         bord.TuckCard(tuckCard.back, bord.selectedSpace + 2);
                                     }
+                                    Destroy(newCard.obj);
 
                                 }
                                 else

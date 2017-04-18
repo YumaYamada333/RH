@@ -49,9 +49,9 @@ public class CardBord : MonoBehaviour {
             if (cards[i].obj == null) break;
 
             const float zPos = -0.1f;
-            cards[i].obj.transform.localPosition = new Vector3((i - centerCard) * cardSize.x, 0.0f, zPos) / transform.localScale.x;
-            if ((selectedSpace == i) && selectedSpace >= 0)
-                cards[i].obj.transform.localPosition += new Vector3(0, 0, -0.3f);
+            cards[i].obj.transform.localPosition = new Vector3((i - centerCard) * cardSize.x - 4.0f, 0.0f, zPos) / transform.localScale.x;
+            //if ((selectedSpace == i) && selectedSpace >= 0)
+            //    cards[i].obj.transform.localPosition += new Vector3(0, 0, -0.3f);
 
             //スクロールボタンが押されたら
             if (Input.GetButton("CardScroll"))
