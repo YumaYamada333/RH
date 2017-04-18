@@ -48,6 +48,7 @@ public class PlayerAction : MonoBehaviour
     private int effect_count = 0;         //エフェクト再生用のカウント
     private int distance = 1;             //rayの長さを決める
     private int distance1 = 2;             //rayの長さを決める
+    private float diff;              //経過時間
 
     private bool isGround;       //地面についているか
     private bool isGroundOld;    //地面についていたか
@@ -237,7 +238,7 @@ public class PlayerAction : MonoBehaviour
             //アニメーション
             animator.SetBool(animation, true);
             //経過時間
-            var diff = Time.timeSinceLevelLoad - startTime;
+            diff = Time.timeSinceLevelLoad - startTime;
             //進行率
             var rate = diff / time;
 
@@ -376,7 +377,10 @@ public class PlayerAction : MonoBehaviour
         {
             if (hit.gameObject.tag == "Untagged")
             {
-                EffekseerHandle jump = EffekseerSystem.PlayEffect("Landing", transform.position);
+                if (diff > time)
+                {
+                    EffekseerHandle jump = EffekseerSystem.PlayEffect("Landing", transform.position);
+                }
             }
         }
     }
