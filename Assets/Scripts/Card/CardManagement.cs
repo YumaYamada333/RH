@@ -69,7 +69,7 @@ public class CardManagement : MonoBehaviour {
     CardData tuckCard;
 
     // カーソルのフォーカス
-    enum CursorForcusTag
+    public enum CursorForcusTag
     {
         HandsBord,
         ActtionBord

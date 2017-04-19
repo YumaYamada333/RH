@@ -13,7 +13,12 @@ public class CardBord : MonoBehaviour {
         public CardManagement.CardType type;
         public GameObject obj;
     }
+    //カードの掴んでる判定
+    CardManagement.CursorForcusTag cursor;
+
     public CardData[] cards = new CardData[numSetMax];
+    Vector3[] tmp = new Vector3[numSetMax];
+    RaycastHit[] hit;
 
     // ボード上のカード数
     public int numSet;
@@ -30,33 +35,170 @@ public class CardBord : MonoBehaviour {
     // 選択中のスペース
     public int selectedSpace;
 
-	// Use this for initialization
-	void Start () {
+    //カードの初期ｚ座標
+    const float zPos = -0.1f;
+
+    //カードの枠越え判定
+    bool exceedFlag = false;
+
+    //フレーム計測
+    int flameCnt = 0;
+
+    // マウスのコンポーネント
+    MouseSystem mouse_system;
+
+    //実行フラグ
+    bool PlayFlag = false;
+
+    //ゲームの状態
+    GameManager state;
+
+    // Use this for initialization
+    void Start ()
+    {
         cardSize = new Vector2(0.8f, 1.0f);
         centerCard = 0;
         selectedSpace = 0;
         //numSet = 0;
         usingCard = 0;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-        centerCard = usingCard;
-        // カードの座標設定
-		for (int i = 0; i < numSetMax; i++)
-        {
-            //条件を満たしたら処理中でもスルー
-            if (cards[i].obj == null) break;
+        exceedFlag = false;
 
-            const float zPos = -0.1f;
-            cards[i].obj.transform.localPosition = new Vector3((i - centerCard) * cardSize.x - 4.0f, 0.0f, zPos) / transform.localScale.x;
+        // MouseSystemコンポーネントの取得
+        mouse_system = GameObject.Find("MouseSystem").GetComponent<MouseSystem>();
+        state = GameObject.Find("GameManager").GetComponent<GameManager>();
+
+        Coordinate();
+
+        //プレイフラグ
+        PlayFlag = false;
+    }
+
+    //カードの初期座標取得関数
+    void Coordinate()
+    {
+
+        centerCard = usingCard;
+        //カードの座標設定
+        for (int i = 0; i < numSetMax; i++)
+        {
+            if (cards[i].obj == null) break;
+            ////カード選択時の座標変更
             //if ((selectedSpace == i) && selectedSpace >= 0)
-            //    cards[i].obj.transform.localPosition += new Vector3(0, 0, -0.3f);
+            //{
+            //    cards[i].obj.transform.localPosition = new Vector3((i - centerCard) * cardSize.x, 0, -3f) / transform.localPosition.x;
+            //}
+            //else
+            //{
+            cards[i].obj.transform.localPosition = new Vector3((i - centerCard) * cardSize.x, 0.0f, zPos) / transform.localScale.x;
+            //}
+        }
+    }
+
+    // Update is called once per frame
+    void Update ()
+    {
+        //アクションモードになったら
+        if (state.GetGameState() == GameManager.GameState.Acttion)
+        {
+            //プレイフラグを立てる
+            PlayFlag = true;
+        }
+
+        //プレイフラグが立ったら
+        if (PlayFlag == true)
+        {
+            //カードを初期位置に移動させる
+            Coordinate();
+        }
+
+        //プレイフラグが立っていないなら
+        if (PlayFlag != true)
+        {
+            // 左クリックしたら
+            if (Input.GetMouseButton(0))
+            {
+                // Rayに触れたオブジェクトをすべて取得
+                hit = mouse_system.GetReyhitObjects();
+                if (hit[hit.Length - 1].collider.tag == "Card")
+                {
+                    //フレーム計測値を初期化
+                    flameCnt = 0;
+                }
+            }
+            else
+            {
+                //フレームを計測する
+                flameCnt++;
+            }
+
+            //カードを掴んだらかカードを離して10フレーム未満なら
+            if (cursor == CardManagement.CursorForcusTag.ActtionBord || (cursor == CardManagement.CursorForcusTag.HandsBord && flameCnt < 10))
+            {
+                //初期座標へ移動
+                Coordinate();
+            }
 
             //スクロールボタンが押されたら
             if (Input.GetButton("CardScroll"))
             {
-                cards[i].obj.transform.Translate(Input.GetAxis("CardScroll"), 0, 0);
+                // カードの座標設定
+                for (int i = 0; i < numSetMax; i++)
+                {
+                    //セットカードの枠を超えたら
+                    if (cards[i].obj.transform.localPosition.x >= 0.5f)
+                    {
+                        //フラグを立てる
+                        exceedFlag = true;
+                    }
+
+                    //枠を超えたら
+                    if (exceedFlag == true)
+                    {
+                        // カードの座標設定
+                        for (int j = 0; j < numSetMax; j++)
+                        {
+
+                            if (Input.GetAxis("CardScroll") > 0)
+                            {
+                                //右スクロール
+                                cards[j].obj.transform.localPosition += new Vector3(0.005f, 0, 0);
+                            }
+                            else if (Input.GetAxis("CardScroll") < 0)
+                            {
+                                //左スクロール
+                                cards[j].obj.transform.localPosition -= new Vector3(0.005f, 0, 0);
+                            }
+                        }
+                    }
+                }
+            }
+
+            //カードを離してかつ10フレームたったら
+            if (cursor != CardManagement.CursorForcusTag.ActtionBord && flameCnt >= 10)
+            {
+                for (int i = 0; i < numSetMax; i++)
+                {
+                    //オブジェクトが存在しているならば
+                    if (cards[i].obj != null)
+                    {
+                        //オブジェクトの座標を取得
+                        tmp[i] = new Vector3(cards[i].obj.transform.localPosition.x, cards[i].obj.transform.localPosition.y, cards[i].obj.transform.localPosition.z);
+                    }
+                    else
+                    {
+                        tmp[i] = new Vector3(0, 0, 0);
+                    }
+
+                    //カード選択時の座標変更
+                    //if ((selectedSpace == i) && selectedSpace >= 0)
+                    //{
+                    //    cards[i].obj.transform.localPosition = new Vector3(tmp[i].x, tmp[i].y, -0.3f);
+                    //}
+                    //else
+                    {
+                        cards[i].obj.transform.localPosition = new Vector3(tmp[i].x, tmp[i].y, zPos);
+                    }
+                }
             }
         }
 
