@@ -89,7 +89,7 @@ public class CardBord : MonoBehaviour {
             //}
             //else
             //{
-            cards[i].obj.transform.localPosition = new Vector3((i - centerCard) * cardSize.x, 0.0f, zPos) / transform.localScale.x;
+            cards[i].obj.transform.localPosition = new Vector3((i - centerCard) * cardSize.x - 4.0f, 0.0f, zPos) / transform.localScale.x;
             //}
         }
     }
@@ -196,7 +196,7 @@ public class CardBord : MonoBehaviour {
                     //}
                     //else
                     {
-                        cards[i].obj.transform.localPosition = new Vector3(tmp[i].x, tmp[i].y, zPos);
+                        //cards[i].obj.transform.localPosition = new Vector3(tmp[i].x, tmp[i].y, zPos);
                     }
                 }
             }
@@ -205,8 +205,11 @@ public class CardBord : MonoBehaviour {
         // 使用済みカードの非表示化
         if (true)
         {
-            cards[usingCard - 1].obj.SetActive(false);
-            cards[usingCard].obj.SetActive(true);
+            if (usingCard <= numSetMax && usingCard > 0)
+            {
+                cards[usingCard - 1].obj.SetActive(false);
+                cards[usingCard].obj.SetActive(true);
+            }
         }
 	}
 
