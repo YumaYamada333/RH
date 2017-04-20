@@ -119,10 +119,14 @@ public class CardBord : MonoBehaviour {
             {
                 // Rayに触れたオブジェクトをすべて取得
                 hit = mouse_system.GetReyhitObjects();
-                if (hit[hit.Length - 1].collider.tag == "Card")
+
+                if (hit.Length > 0)
                 {
-                    //フレーム計測値を初期化
-                    flameCnt = 0;
+                    if (hit[hit.Length - 1].collider.tag == "Card")
+                    {
+                        //フレーム計測値を初期化
+                        flameCnt = 0;
+                    }
                 }
             }
             else

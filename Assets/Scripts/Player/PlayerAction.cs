@@ -307,24 +307,24 @@ public class PlayerAction : MonoBehaviour
                     EffekseerHandle attack = EffekseerSystem.PlayEffect("attake", transform.position);
                     break;
 
-                //スーパーシリーズ//
-                //case CardManagement.CardType.SuperMove:
-                //    cardSetFlag = true;
-                //    animationNum = (int)ANIMATION.SUPERRUN;
-                //    animationName = "Run";
-                //    break;
+                // 辻 // スーパーシリーズ // 辻 //
+                case CardManagement.CardType.SuperMove:
+                    cardSetFlag = true;
+                    animationNum = (int)ANIMATION.SUPERRUN;
+                    animationName = "Run";
+                    break;
 
-                //case CardManagement.CardType.SuperJump:
-                //    cardSetFlag = true;
-                //    animationNum = (int)ANIMATION.SUPERJUMP;
-                //    animationName = "Jump";
-                //    break;
+                case CardManagement.CardType.SuperJump:
+                    cardSetFlag = true;
+                    animationNum = (int)ANIMATION.SUPERJUMP;
+                    animationName = "Jump";
+                    break;
 
-                //case CardManagement.CardType.SuperAttack:
-                //    cardSetFlag = true;
-                //    animationNum = (int)ANIMATION.SUPERATTACK;
-                //    animationName = "Attack";
-                //    break;
+                case CardManagement.CardType.SuperAttack:
+                    cardSetFlag = true;
+                    animationNum = (int)ANIMATION.SUPERATTACK;
+                    animationName = "Attack";
+                    break;
 
                 //終了カード
                 case CardManagement.CardType.Finish:
