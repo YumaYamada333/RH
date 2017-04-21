@@ -22,7 +22,7 @@ static class Constants
     public const int EffectJumpCount = 65;  //ジャンプしてから着地までのカウント
     public const int MoveCount = 60;    //移動エフェクトのループ再生する間隔
 }
-enum ANIMATION { RUN, JUMP, ATTACK ,SUPERRUN , SUPERJUMP , SUPERATTACK};
+enum ANIMATION { RUN, JUMP, ATTACK ,SUPERRUN , SUPERJUMP , SUPERATTACK ,OVER};
 public class PlayerAction : MonoBehaviour
 {
     [SerializeField, Range(0, Constants.MaxTime)]
@@ -328,7 +328,11 @@ public class PlayerAction : MonoBehaviour
 
                 //終了カード
                 case CardManagement.CardType.Finish:
-                    Application.LoadLevel("Over");
+                    cardSetFlag = true;
+                    animationNum = (int)ANIMATION.ATTACK;
+                    animationName = "Over";
+                    // 五秒後にゲームオーバー
+                    GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2);
 
                     break;
             }
@@ -349,7 +353,8 @@ public class PlayerAction : MonoBehaviour
         {
             //エフェクト再生
             EffekseerHandle p_damage = EffekseerSystem.PlayEffect("PlayerDamage", transform.position);
-            Application.LoadLevel("Over");
+            // 五秒後にゲームオーバー
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2, ToResultScene.OverType.FALL);
         }
 
     }
@@ -365,12 +370,14 @@ public class PlayerAction : MonoBehaviour
         //ゴール
         if (hit.gameObject.tag == "Goal")
         {
-            Application.LoadLevel("Result");
+            // 五秒後にゲームオーバー
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToClear(5);
         }
         //トゲ
         if (hit.gameObject.tag == "Thorn")
         {
-            Application.LoadLevel("Over");
+            // 五秒後にゲームオーバー
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(5);
         }
         //地面
         if (isGround == false && isGroundOld == false)
@@ -433,5 +440,10 @@ public class PlayerAction : MonoBehaviour
         return isGround;
     }
 
+    // アニメーションを止める
+    public void AnimationStop()
+    {
+        animator.SetBool(animationName, false);
+    }
 }
 
