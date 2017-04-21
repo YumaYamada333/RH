@@ -36,6 +36,8 @@ public class PlayerAction : MonoBehaviour
     [SerializeField]
     Vector3 nextPosition = new Vector3(2, 0, 0);  //次の場所
     private float startTime;        //走り始めた時間
+    [SerializeField]
+    private float downFall = 0;
     private Vector3 startPosition;  //走り始める場所
     private Animator animator;      //アニメーター
     private bool[] animationFlag = new bool[Constants.MaxAnimation];   //アニメーションしているかどうかのフラグ
@@ -88,15 +90,15 @@ public class PlayerAction : MonoBehaviour
         //Debug.DrawLine(ray.origin, ray.direction * distance, Color.red);
 
         //rayとの当たり判定
-        if (Physics.Raycast(ray ,out hit, distance))
+        if (Physics.Raycast(ray, out hit, distance))
         {
         }
         else
         {
             //Run
-            if(animationFlag[(int)ANIMATION.RUN])
-                if(isGround)
-                    middlePosition.y--;
+            if (animationFlag[(int)ANIMATION.RUN] || animationFlag[(int)ANIMATION.SUPERRUN])
+                // if (isGround)
+                middlePosition.y --;
 
         }
 
@@ -158,14 +160,8 @@ public class PlayerAction : MonoBehaviour
     //!
     //! @return idelFlag
     //----------------------------------------------------------------------
-    bool IsIdle()
+    public bool IsIdle()
     {
-        ////何らかのアニメーションをしている場合
-        //if (animationFlag[(int)ANIMATION.RUN] == true || animationFlag[(int)ANIMATION.JUMP] == true || animationFlag[(int)ANIMATION.ATTACK] == true ||
-        //    animationFlag[(int)ANIMATION.SUPERRUN] == true || animationFlag[(int)ANIMATION.SUPERJUMP] == true || animationFlag[(int)ANIMATION.SUPERATTACK] == true)
-        //{
-        //    idleFlag = false;
-        //}
         //待機中の場合
         if (animationFlag[(int)ANIMATION.RUN] == false && animationFlag[(int)ANIMATION.JUMP] == false && animationFlag[(int)ANIMATION.ATTACK] == false &&
             animationFlag[(int)ANIMATION.SUPERRUN] == false && animationFlag[(int)ANIMATION.SUPERJUMP] == false && animationFlag[(int)ANIMATION.SUPERATTACK] == false)
