@@ -98,6 +98,11 @@ public class CardManagement : MonoBehaviour {
     void Start () {
         isUpdateData = true;
         isControlCard = true;
+
+        // boardサイズの設定
+        handsBord.transform.localScale = new Vector3(10, 1.5f, 1);
+        actionBord.transform.localScale = new Vector3(10, 1.5f, 1);
+
         // サイズの取得(m)
         handsBordSize = new Vector2(handsBord.transform.lossyScale.x, handsBord.transform.lossyScale.y);
         actionBordSize = new Vector2(actionBord.transform.lossyScale.x, actionBord.transform.lossyScale.y);
