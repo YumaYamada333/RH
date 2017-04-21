@@ -213,19 +213,19 @@ public class PlayerAction : MonoBehaviour
                     middlePosition = new Vector3(transform.position.x, middlePosition.y, 0);
                     endPosition = new Vector3(transform.position.x, endPosition.y, 0);
                     break;
-                    //スーパーシリーズ//
-                //case (int)ANIMATION.SUPERRUN:
-                //    middlePosition = new Vector3(middlePosition.x + nextPosition.x / 2, middlePosition.y, 0);
-                //    endPosition = new Vector3(endPosition.x + nextPosition.x, endPosition.y, 0);
-                //    break;
-                //case (int)ANIMATION.SUPERJUMP:
-                //    middlePosition = new Vector3(middlePosition.x + nextPosition.x / 2, middlePosition.y, 0);
-                //    endPosition = new Vector3(endPosition.x + nextPosition.x, endPosition.y, 0);
-                //    break;
-                //case (int)ANIMATION.SUPERATTACK:
-                //    middlePosition = new Vector3(transform.position.x, middlePosition.y, 0);
-                //    endPosition = new Vector3(transform.position.x, endPosition.y, 0);
-                //    break;
+                //スーパーシリーズ//
+                case (int)ANIMATION.SUPERRUN:
+                    middlePosition = new Vector3(middlePosition.x + nextPosition.x, middlePosition.y, 0);
+                    endPosition = new Vector3(endPosition.x + nextPosition.x * 2, endPosition.y, 0);
+                    break;
+                case (int)ANIMATION.SUPERJUMP:
+                    middlePosition = new Vector3(middlePosition.x + nextPosition.x / 2, middlePosition.y += jumpPower * 2, 0);
+                    endPosition = new Vector3(endPosition.x + nextPosition.x, endPosition.y, 0);
+                    break;
+                case (int)ANIMATION.SUPERATTACK:
+                    middlePosition = new Vector3(transform.position.x, middlePosition.y, 0);
+                    endPosition = new Vector3(transform.position.x, endPosition.y, 0);
+                    break;
 
             }
 
@@ -408,16 +408,6 @@ public class PlayerAction : MonoBehaviour
                         effect_count = 0;
                     }
                     break;
-                //    //ダメな原因
-                //case (int)ANIMATION.JUMP:
-                //    //エフェクトを設定した間隔で再生
-                //    effect_count++;
-                //    if (effect_count >= Constants.EffectJumpCount)
-                //    {
-                //        EffekseerHandle jump = EffekseerSystem.PlayEffect("Landing", transform.position);
-                //        effect_count = 0;
-                //    }
-                //    break;
             }
         }
     }
