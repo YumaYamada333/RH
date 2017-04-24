@@ -211,8 +211,12 @@ public class CardBord : MonoBehaviour {
         {
             if (usingCard <= numSetMax && usingCard > 0)
             {
-                cards[usingCard - 1].obj.SetActive(false);
-                cards[usingCard].obj.SetActive(true);
+                if (cards[usingCard].obj && cards[usingCard - 1].obj)
+                {
+                    cards[usingCard - 1].obj.SetActive(false);
+                    cards[usingCard].obj.SetActive(true);
+
+                }
             }
         }
 	}

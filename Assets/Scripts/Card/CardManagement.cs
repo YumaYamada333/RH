@@ -274,6 +274,7 @@ public class CardManagement : MonoBehaviour {
                     {
                         for (int i = 0; i < bord.cards.Length; i++)
                         {
+                            if (!bord.cards[i].obj) continue;
                             //挟みたいカードとボードのカード座標が同じ
                             if (bord.cards[i].obj.transform.position == select_card.transform.position)
                             {
