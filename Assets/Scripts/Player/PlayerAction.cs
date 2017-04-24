@@ -48,7 +48,7 @@ public class PlayerAction : MonoBehaviour
     private GameObject[] enemy;           //敵
     private AudioSource audioSource;      //音
     private int effect_count = 0;         //エフェクト再生用のカウント
-    private int distance = 1;             //rayの長さを決める
+    private int distance = 100;             //rayの長さを決める
     private int distance1 = 2;             //rayの長さを決める
     private float diff;              //経過時間
 
@@ -83,22 +83,23 @@ public class PlayerAction : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Ray ray = new Ray(transform.position + new Vector3(0,0.1f,0), new Vector3(0,-1,0)); //ray
-        Ray ray1 = new Ray(transform.position, transform.forward);
+        Ray ray = new Ray(transform.position /*+ new Vector3(0,0.1f,0)*/, Vector3.down); //ray
+       // Ray ray1 = new Ray(transform.position, transform.forward);
         RaycastHit hit; //rayと接触したcolliderの判定
         //debug//
-        //Debug.DrawLine(ray.origin, ray.direction * distance, Color.red);
+        Debug.DrawLine(ray.origin, transform.position + Vector3.down , Color.red);
 
         //rayとの当たり判定
         if (Physics.Raycast(ray, out hit, distance))
         {
+            Debug.Log(hit.transform.name);
         }
         else
         {
             //Run
-            if (animationFlag[(int)ANIMATION.RUN] || animationFlag[(int)ANIMATION.SUPERRUN])
-                // if (isGround)
-                middlePosition.y --;
+            //if (animationFlag[(int)ANIMATION.RUN] || animationFlag[(int)ANIMATION.SUPERRUN])
+            //    // if (isGround)
+            //    middlePosition.y --;
 
         }
 
@@ -168,6 +169,7 @@ public class PlayerAction : MonoBehaviour
         {
             idleFlag = true;
         }
+        //そうでない場合
         else
         {
             idleFlag = false;
