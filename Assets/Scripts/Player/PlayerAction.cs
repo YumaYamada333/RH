@@ -147,7 +147,6 @@ public class PlayerAction : MonoBehaviour
         {
             isGround = false;
         }
-        isGroundOld = isGround;
     }
 
     //----------------------------------------------------------------------
@@ -200,6 +199,8 @@ public class PlayerAction : MonoBehaviour
             animationFlag[animationFlagNum] = true;
             //時間の計測
             startTime = Time.timeSinceLevelLoad;
+            isGroundOld = isGround;
+
             switch (animationFlagNum)
             {
                 case (int)ANIMATION.RUN:
