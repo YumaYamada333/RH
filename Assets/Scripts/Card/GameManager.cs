@@ -67,9 +67,13 @@ public class GameManager : MonoBehaviour
                 // カードセットの操作を受け付けないようにする
                 //cardManage.isControlCard = false;
                 cardTime += Time.deltaTime;
-                if (cardTime > CPS)
+                //辻流己//
+                // if (cardTime > CPS)
+                //PlayrActionの情報を取得
+                PlayerAction player = playerAction.GetComponent<PlayerAction>();
+                //待機中なら
+                if (player.IsIdle())
                 {
-                    PlayerAction player = playerAction.GetComponent<PlayerAction>();
                     //プレイヤーがいることを確認
                     if (player != null)
                     {

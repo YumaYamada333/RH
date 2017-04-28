@@ -22,7 +22,7 @@ static class Constants
     public const int EffectJumpCount = 65;  //ジャンプしてから着地までのカウント
     public const int MoveCount = 60;    //移動エフェクトのループ再生する間隔
 }
-enum ANIMATION { RUN, JUMP, ATTACK ,SUPERRUN , SUPERJUMP , SUPERATTACK};
+enum ANIMATION { RUN, JUMP, ATTACK ,SUPERRUN , SUPERJUMP , SUPERATTACK ,OVER};
 public class PlayerAction : MonoBehaviour
 {
     [SerializeField, Range(0, Constants.MaxTime)]
@@ -36,6 +36,8 @@ public class PlayerAction : MonoBehaviour
     [SerializeField]
     Vector3 nextPosition = new Vector3(2, 0, 0);  //次の場所
     private float startTime;        //走り始めた時間
+    [SerializeField]
+    private float downFall = 0;
     private Vector3 startPosition;  //走り始める場所
     private Animator animator;      //アニメーター
     private bool[] animationFlag = new bool[Constants.MaxAnimation];   //アニメーションしているかどうかのフラグ
@@ -46,8 +48,9 @@ public class PlayerAction : MonoBehaviour
     private GameObject[] enemy;           //敵
     private AudioSource audioSource;      //音
     private int effect_count = 0;         //エフェクト再生用のカウント
-    private int distance = 1;             //rayの長さを決める
+    private int distance = 100;             //rayの長さを決める
     private int distance1 = 2;             //rayの長さを決める
+    private float diff;              //経過時間
 
     private bool isGround;       //地面についているか
     private bool isGroundOld;    //地面についていたか
@@ -80,22 +83,23 @@ public class PlayerAction : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Ray ray = new Ray(transform.position + new Vector3(0,0.1f,0), new Vector3(0,-1,0)); //ray
-        Ray ray1 = new Ray(transform.position, transform.forward);
+        Ray ray = new Ray(transform.position /*+ new Vector3(0,0.1f,0)*/, Vector3.down); //ray
+       // Ray ray1 = new Ray(transform.position, transform.forward);
         RaycastHit hit; //rayと接触したcolliderの判定
         //debug//
-        //Debug.DrawLine(ray.origin, ray.direction * distance, Color.red);
+        Debug.DrawLine(ray.origin, transform.position + Vector3.down , Color.red);
 
         //rayとの当たり判定
-        if (Physics.Raycast(ray ,out hit, distance))
+        if (Physics.Raycast(ray, out hit, distance))
         {
+            Debug.Log(hit.transform.name);
         }
         else
         {
             //Run
-            if(animationFlag[(int)ANIMATION.RUN])
-                if(isGround)
-                    middlePosition.y--;
+            //if (animationFlag[(int)ANIMATION.RUN] || animationFlag[(int)ANIMATION.SUPERRUN])
+            //    // if (isGround)
+            //    middlePosition.y --;
 
         }
 
@@ -156,20 +160,15 @@ public class PlayerAction : MonoBehaviour
     //!
     //! @return idelFlag
     //----------------------------------------------------------------------
-    bool IsIdle()
+    public bool IsIdle()
     {
-        ////何らかのアニメーションをしている場合
-        //if (animationFlag[(int)ANIMATION.RUN] == true || animationFlag[(int)ANIMATION.JUMP] == true || animationFlag[(int)ANIMATION.ATTACK] == true ||
-        //    animationFlag[(int)ANIMATION.SUPERRUN] == true || animationFlag[(int)ANIMATION.SUPERJUMP] == true || animationFlag[(int)ANIMATION.SUPERATTACK] == true)
-        //{
-        //    idleFlag = false;
-        //}
         //待機中の場合
         if (animationFlag[(int)ANIMATION.RUN] == false && animationFlag[(int)ANIMATION.JUMP] == false && animationFlag[(int)ANIMATION.ATTACK] == false &&
             animationFlag[(int)ANIMATION.SUPERRUN] == false && animationFlag[(int)ANIMATION.SUPERJUMP] == false && animationFlag[(int)ANIMATION.SUPERATTACK] == false)
         {
             idleFlag = true;
         }
+        //そうでない場合
         else
         {
             idleFlag = false;
@@ -213,19 +212,19 @@ public class PlayerAction : MonoBehaviour
                     middlePosition = new Vector3(transform.position.x, middlePosition.y, 0);
                     endPosition = new Vector3(transform.position.x, endPosition.y, 0);
                     break;
-                    //スーパーシリーズ//
-                //case (int)ANIMATION.SUPERRUN:
-                //    middlePosition = new Vector3(middlePosition.x + nextPosition.x / 2, middlePosition.y, 0);
-                //    endPosition = new Vector3(endPosition.x + nextPosition.x, endPosition.y, 0);
-                //    break;
-                //case (int)ANIMATION.SUPERJUMP:
-                //    middlePosition = new Vector3(middlePosition.x + nextPosition.x / 2, middlePosition.y, 0);
-                //    endPosition = new Vector3(endPosition.x + nextPosition.x, endPosition.y, 0);
-                //    break;
-                //case (int)ANIMATION.SUPERATTACK:
-                //    middlePosition = new Vector3(transform.position.x, middlePosition.y, 0);
-                //    endPosition = new Vector3(transform.position.x, endPosition.y, 0);
-                //    break;
+                //スーパーシリーズ//
+                case (int)ANIMATION.SUPERRUN:
+                    middlePosition = new Vector3(middlePosition.x + nextPosition.x, middlePosition.y, 0);
+                    endPosition = new Vector3(endPosition.x + nextPosition.x * 2, endPosition.y, 0);
+                    break;
+                case (int)ANIMATION.SUPERJUMP:
+                    middlePosition = new Vector3(middlePosition.x + nextPosition.x / 2, middlePosition.y += jumpPower * 2, 0);
+                    endPosition = new Vector3(endPosition.x + nextPosition.x, endPosition.y, 0);
+                    break;
+                case (int)ANIMATION.SUPERATTACK:
+                    middlePosition = new Vector3(transform.position.x, middlePosition.y, 0);
+                    endPosition = new Vector3(transform.position.x, endPosition.y, 0);
+                    break;
 
             }
 
@@ -238,7 +237,7 @@ public class PlayerAction : MonoBehaviour
             //アニメーション
             animator.SetBool(animation, true);
             //経過時間
-            var diff = Time.timeSinceLevelLoad - startTime;
+            diff = Time.timeSinceLevelLoad - startTime;
             //進行率
             var rate = diff / time;
 
@@ -307,28 +306,32 @@ public class PlayerAction : MonoBehaviour
                     EffekseerHandle attack = EffekseerSystem.PlayEffect("attake", transform.position);
                     break;
 
-                //スーパーシリーズ//
-                //case CardManagement.CardType.SuperMove:
-                //    cardSetFlag = true;
-                //    animationNum = (int)ANIMATION.SUPERRUN;
-                //    animationName = "Run";
-                //    break;
+                // 辻 // スーパーシリーズ // 辻 //
+                case CardManagement.CardType.SuperMove:
+                    cardSetFlag = true;
+                    animationNum = (int)ANIMATION.SUPERRUN;
+                    animationName = "Run";
+                    break;
 
-                //case CardManagement.CardType.SuperJump:
-                //    cardSetFlag = true;
-                //    animationNum = (int)ANIMATION.SUPERJUMP;
-                //    animationName = "Jump";
-                //    break;
+                case CardManagement.CardType.SuperJump:
+                    cardSetFlag = true;
+                    animationNum = (int)ANIMATION.SUPERJUMP;
+                    animationName = "Jump";
+                    break;
 
-                //case CardManagement.CardType.SuperAttack:
-                //    cardSetFlag = true;
-                //    animationNum = (int)ANIMATION.SUPERATTACK;
-                //    animationName = "Attack";
-                //    break;
+                case CardManagement.CardType.SuperAttack:
+                    cardSetFlag = true;
+                    animationNum = (int)ANIMATION.SUPERATTACK;
+                    animationName = "Attack";
+                    break;
 
                 //終了カード
                 case CardManagement.CardType.Finish:
-                    Application.LoadLevel("Over");
+                    cardSetFlag = true;
+                    animationNum = (int)ANIMATION.ATTACK;
+                    animationName = "Over";
+                    // 五秒後にゲームオーバー
+                    GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2);
 
                     break;
             }
@@ -349,7 +352,8 @@ public class PlayerAction : MonoBehaviour
         {
             //エフェクト再生
             EffekseerHandle p_damage = EffekseerSystem.PlayEffect("PlayerDamage", transform.position);
-            Application.LoadLevel("Over");
+            // 五秒後にゲームオーバー
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(2, ToResultScene.OverType.FALL);
         }
 
     }
@@ -365,19 +369,24 @@ public class PlayerAction : MonoBehaviour
         //ゴール
         if (hit.gameObject.tag == "Goal")
         {
-            Application.LoadLevel("Result");
+            // 五秒後にゲームオーバー
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToClear(5);
         }
         //トゲ
         if (hit.gameObject.tag == "Thorn")
         {
-            Application.LoadLevel("Over");
+            // 五秒後にゲームオーバー
+            GameObject.Find("GameManager").GetComponent<ToResultScene>().ToOver(5);
         }
         //地面
         if (isGround == false && isGroundOld == false)
         {
             if (hit.gameObject.tag == "Untagged")
             {
-                EffekseerHandle jump = EffekseerSystem.PlayEffect("Landing", transform.position);
+                if (diff > time)
+                {
+                    EffekseerHandle jump = EffekseerSystem.PlayEffect("Landing", transform.position);
+                }
             }
         }
     }
@@ -405,16 +414,6 @@ public class PlayerAction : MonoBehaviour
                         effect_count = 0;
                     }
                     break;
-                //    //ダメな原因
-                //case (int)ANIMATION.JUMP:
-                //    //エフェクトを設定した間隔で再生
-                //    effect_count++;
-                //    if (effect_count >= Constants.EffectJumpCount)
-                //    {
-                //        EffekseerHandle jump = EffekseerSystem.PlayEffect("Landing", transform.position);
-                //        effect_count = 0;
-                //    }
-                //    break;
             }
         }
     }
@@ -430,5 +429,10 @@ public class PlayerAction : MonoBehaviour
         return isGround;
     }
 
+    // アニメーションを止める
+    public void AnimationStop()
+    {
+        animator.SetBool(animationName, false);
+    }
 }
 

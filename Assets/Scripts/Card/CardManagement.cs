@@ -19,6 +19,9 @@ public class CardManagement : MonoBehaviour {
     public GameObject moveCard;
     public GameObject jumpCard;
     public GameObject attackCard;
+    public GameObject superMoveCard;
+    public GameObject superJumpCard;
+    public GameObject superAttackCard;
     public GameObject finishCard;
     Vector2 cardSize;
 
@@ -37,6 +40,9 @@ public class CardManagement : MonoBehaviour {
         Move,
         Jump,
         Attack,
+        SuperMove,
+        SuperJump,
+        SuperAttack,
         Finish,
         Nothing,
         NumType
@@ -69,7 +75,7 @@ public class CardManagement : MonoBehaviour {
     CardData tuckCard;
 
     // カーソルのフォーカス
-    enum CursorForcusTag
+    public enum CursorForcusTag
     {
         HandsBord,
         ActtionBord
@@ -92,6 +98,11 @@ public class CardManagement : MonoBehaviour {
     void Start () {
         isUpdateData = true;
         isControlCard = true;
+
+        // boardサイズの設定
+        handsBord.transform.localScale = new Vector3(10, 1.5f, 1);
+        actionBord.transform.localScale = new Vector3(10, 1.5f, 1);
+
         // サイズの取得(m)
         handsBordSize = new Vector2(handsBord.transform.lossyScale.x, handsBord.transform.lossyScale.y);
         actionBordSize = new Vector2(actionBord.transform.lossyScale.x, actionBord.transform.lossyScale.y);
@@ -201,24 +212,27 @@ public class CardManagement : MonoBehaviour {
                 // Rayに触れたオブジェクトをすべて取得
                 hit = mouse_system.GetReyhitObjects();
 
-                if (hit[hit.Length - 1].collider.tag == "Card")
+                if (hit.Length > 0)
                 {
-                    for (int i = 0; i < cards.Length; i++)
+                    if (hit[hit.Length - 1].collider.tag == "Card")
                     {
-                        if (cards[i].front.obj != null)
+                        for (int i = 0; i < cards.Length; i++)
                         {
-                            // Rayに触れているオブジェクトとボードのカードの座標が同じ
-                            if (hit[hit.Length - 1].transform.position == cards[i].front.obj.transform.position)
+                            if (cards[i].front.obj != null)
                             {
-                                // はさむカードに設定
-                                selectedCard = i;
-                                tuckCard = cards[selectedCard];
-                                break;
+                                // Rayに触れているオブジェクトとボードのカードの座標が同じ
+                                if (hit[hit.Length - 1].transform.position == cards[i].front.obj.transform.position)
+                                {
+                                    // はさむカードに設定
+                                    selectedCard = i;
+                                    tuckCard = cards[selectedCard];
+                                    break;
+                                }
                             }
                         }
+                        cursor = CursorForcusTag.ActtionBord;
+                        actionBord.GetComponent<CardBord>().selectedSpace = -1;
                     }
-                    cursor = CursorForcusTag.ActtionBord;
-                    actionBord.GetComponent<CardBord>().selectedSpace = -1;
                 }
             }
         }
@@ -260,6 +274,7 @@ public class CardManagement : MonoBehaviour {
                     {
                         for (int i = 0; i < bord.cards.Length; i++)
                         {
+                            if (!bord.cards[i].obj) continue;
                             //挟みたいカードとボードのカード座標が同じ
                             if (bord.cards[i].obj.transform.position == select_card.transform.position)
                             {
@@ -286,6 +301,7 @@ public class CardManagement : MonoBehaviour {
                                         bord.TuckCard(tuckCard.front, bord.selectedSpace);
                                         bord.TuckCard(tuckCard.back, bord.selectedSpace + 2);
                                     }
+                                    Destroy(newCard.obj);
 
                                 }
                                 else
@@ -332,6 +348,15 @@ public class CardManagement : MonoBehaviour {
                 case CardType.Attack:
                     card.obj = Instantiate(attackCard);
                     break;
+                case CardType.SuperMove:
+                    card.obj = Instantiate(superMoveCard);
+                    break;
+                case CardType.SuperJump:
+                    card.obj = Instantiate(superJumpCard);
+                    break;
+                case CardType.SuperAttack:
+                    card.obj = Instantiate(superAttackCard);
+                    break;
                 case CardType.Finish:
                     card.obj = Instantiate(finishCard);
                     break;
@@ -377,8 +402,14 @@ public class CardManagement : MonoBehaviour {
         switch ((int)type + (int)type1 * back)
         {
             // 仮
+            case (int)CardType.Move + (int)CardType.Move * back:
+                result = CardType.SuperMove;
+                break;
+            case (int)CardType.Jump + (int)CardType.Jump * back:
+                result = CardType.SuperJump;
+                break;
             case (int)CardType.Attack + (int)CardType.Attack * back:
-                result = CardType.Jump;
+                result = CardType.SuperAttack;
                 break;
             default:
                 result = CardType.Nothing;
