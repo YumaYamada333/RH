@@ -15,19 +15,20 @@ public class CardBord : MonoBehaviour {
     }
     //カードの掴んでる判定
     CardManagement.CursorForcusTag cursor;
+    CardManagement cardManegement;
 
     public CardData[] cards = new CardData[numSetMax];
-    Vector3[] tmp = new Vector3[numSetMax];
+    public Vector3[] tmp = new Vector3[numSetMax];
     RaycastHit[] hit;
 
     // ボード上のカード数
     public int numSet;
 
     // カードのサイズ
-    Vector2 cardSize;
+    public Vector2 cardSize;
 
     // 中心のカード
-    int centerCard;
+    public int centerCard;
 
     // 使用中カード
     public int usingCard;
@@ -54,7 +55,7 @@ public class CardBord : MonoBehaviour {
     GameManager state;
 
     // Use this for initialization
-    void Start ()
+    public void Start ()
     {
         cardSize = new Vector2(0.8f, 1.0f);
         centerCard = 0;
@@ -63,9 +64,10 @@ public class CardBord : MonoBehaviour {
         usingCard = 0;
         exceedFlag = false;
 
-        // MouseSystemコンポーネントの取得
+        // コンポーネントの取得
         mouse_system = GameObject.Find("MouseSystem").GetComponent<MouseSystem>();
         state = GameObject.Find("GameManager").GetComponent<GameManager>();
+        cardManegement = GameObject.Find("CardManager").GetComponent<CardManagement>();
 
         Coordinate();
 
@@ -74,23 +76,16 @@ public class CardBord : MonoBehaviour {
     }
 
     //カードの初期座標取得関数
-    void Coordinate()
+    public void Coordinate()
     {
-
         centerCard = usingCard;
         //カードの座標設定
         for (int i = 0; i < numSetMax; i++)
         {
             if (cards[i].obj == null) break;
-            ////カード選択時の座標変更
-            //if ((selectedSpace == i) && selectedSpace >= 0)
-            //{
-            //    cards[i].obj.transform.localPosition = new Vector3((i - centerCard) * cardSize.x, 0, -3f) / transform.localPosition.x;
-            //}
-            //else
-            //{
-            cards[i].obj.transform.localPosition = new Vector3((i - centerCard) * cardSize.x - 4.0f, 0.0f, zPos) / transform.localScale.x;
-            //}
+            cards[i].obj.transform.localPosition = new Vector3((i - centerCard) * cardSize.x, 0.0f, zPos) / transform.localScale.x;
+            //cards[i].obj.transform.localPosition = new Vector3(i * cardSize.x / transform.localScale.x, 0.0f, zPos);
+
         }
     }
 
@@ -114,19 +109,16 @@ public class CardBord : MonoBehaviour {
         //プレイフラグが立っていないなら
         if (PlayFlag != true)
         {
+
             // 左クリックしたら
             if (Input.GetMouseButton(0))
             {
                 // Rayに触れたオブジェクトをすべて取得
                 hit = mouse_system.GetReyhitObjects();
-
-                if (hit.Length > 0)
+                if (hit[hit.Length - 1].collider.tag == "Card")
                 {
-                    if (hit[hit.Length - 1].collider.tag == "Card")
-                    {
-                        //フレーム計測値を初期化
-                        flameCnt = 0;
-                    }
+                    //フレーム計測値を初期化
+                    flameCnt = 0;
                 }
             }
             else
@@ -134,6 +126,7 @@ public class CardBord : MonoBehaviour {
                 //フレームを計測する
                 flameCnt++;
             }
+
 
             //カードを掴んだらかカードを離して10フレーム未満なら
             if (cursor == CardManagement.CursorForcusTag.ActtionBord || (cursor == CardManagement.CursorForcusTag.HandsBord && flameCnt < 10))
@@ -192,16 +185,7 @@ public class CardBord : MonoBehaviour {
                     {
                         tmp[i] = new Vector3(0, 0, 0);
                     }
-
-                    //カード選択時の座標変更
-                    //if ((selectedSpace == i) && selectedSpace >= 0)
-                    //{
-                    //    cards[i].obj.transform.localPosition = new Vector3(tmp[i].x, tmp[i].y, -0.3f);
-                    //}
-                    //else
-                    {
-                        //cards[i].obj.transform.localPosition = new Vector3(tmp[i].x, tmp[i].y, zPos);
-                    }
+                    cards[i].obj.transform.localPosition = new Vector3(tmp[i].x, tmp[i].y, zPos);
                 }
             }
         }
@@ -209,15 +193,8 @@ public class CardBord : MonoBehaviour {
         // 使用済みカードの非表示化
         if (true)
         {
-            if (usingCard <= numSetMax && usingCard > 0)
-            {
-                if (cards[usingCard].obj && cards[usingCard - 1].obj)
-                {
-                    cards[usingCard - 1].obj.SetActive(false);
-                    cards[usingCard].obj.SetActive(true);
-
-                }
-            }
+            cards[usingCard - 1].obj.SetActive(false);
+            cards[usingCard].obj.SetActive(true);
         }
 	}
 
@@ -282,4 +259,5 @@ public class CardBord : MonoBehaviour {
         else
             return cards[no].type;
     }
+
 }

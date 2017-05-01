@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CardManagement : MonoBehaviour {
-
+public class CardManagement : MonoBehaviour
+{
     /* 説明
     カード処理系の管理クラス
     処理はここで一括管理する
@@ -19,9 +19,6 @@ public class CardManagement : MonoBehaviour {
     public GameObject moveCard;
     public GameObject jumpCard;
     public GameObject attackCard;
-    public GameObject superMoveCard;
-    public GameObject superJumpCard;
-    public GameObject superAttackCard;
     public GameObject finishCard;
     Vector2 cardSize;
 
@@ -32,7 +29,7 @@ public class CardManagement : MonoBehaviour {
     int numCardSet;
 
     // カード最大の所持数
-    const int numMax = 99;  
+    public const int numMax = 99;  
 
     // カードの種類
     public enum CardType
@@ -40,16 +37,15 @@ public class CardManagement : MonoBehaviour {
         Move,
         Jump,
         Attack,
-        SuperMove,
-        SuperJump,
-        SuperAttack,
         Finish,
         Nothing,
         NumType
     }
 
+    //初期カードの種類
+
     // カードの種類数配列を確保
-    struct CardData
+    public struct CardData
     {
         // 前のカード 後ろのカード
         public CardBord.CardData front;
@@ -59,7 +55,7 @@ public class CardManagement : MonoBehaviour {
         // 所持数
         public int numHold;
     }
-    CardData[] cards = new CardData[numMax];
+    public CardData[] cards = new CardData[numMax];
 
     // 最初のカードの配置位置
     Vector2 firstPos;
@@ -94,15 +90,22 @@ public class CardManagement : MonoBehaviour {
     // Rayに触れたオブジェクト
     RaycastHit[] hit;
 
+    //初期所持カード配置関数
+    public void Possession()
+    {
+        // ステージのカード配置
+        CardBord bord = actionBord.GetComponent<CardBord>();
+        bord.SetCard(Instantiate(moveCard), CardType.Move);
+        bord.SetCard(Instantiate(moveCard), CardType.Move);
+        bord.SetCard(Instantiate(moveCard), CardType.Move);
+        bord.SetCard(Instantiate(finishCard), CardType.Finish);
+
+    }
+
     // Use this for initialization
-    void Start () {
+    public void Start () {
         isUpdateData = true;
         isControlCard = true;
-
-        // boardサイズの設定
-        handsBord.transform.localScale = new Vector3(10, 1.5f, 1);
-        actionBord.transform.localScale = new Vector3(10, 1.5f, 1);
-
         // サイズの取得(m)
         handsBordSize = new Vector2(handsBord.transform.lossyScale.x, handsBord.transform.lossyScale.y);
         actionBordSize = new Vector2(actionBord.transform.lossyScale.x, actionBord.transform.lossyScale.y);
@@ -121,14 +124,9 @@ public class CardManagement : MonoBehaviour {
         SetCard(CardType.Move, CardType.Move);
         SetCard(CardType.Jump, CardType.Jump);
         SetCard(CardType.Jump, CardType.Jump);
-        
 
-        // ステージの仮のmoveカード配置
-        CardBord bord = actionBord.GetComponent<CardBord>();
-        bord.SetCard(Instantiate(moveCard), CardType.Move);
-        bord.SetCard(Instantiate(moveCard), CardType.Move);
-        bord.SetCard(Instantiate(moveCard), CardType.Move);
-        bord.SetCard(Instantiate(finishCard), CardType.Finish);
+        //初期所持カード
+        Possession();
 
         // MouseSystemコンポーネントの取得
         mouse_system = GameObject.Find("MouseSystem").GetComponent<MouseSystem>();
@@ -160,6 +158,7 @@ public class CardManagement : MonoBehaviour {
             // 枚数0所持カードの破棄
             if (cards[i].numHold == 0 && cards[i].front.obj == null && cards[i].back.obj == null)
             {
+                //カードの破棄
                 DestroyCards(ref cards[i].front);
                 DestroyCards(ref cards[i].back);
                 // 残り枚数のUIの破棄
@@ -177,8 +176,13 @@ public class CardManagement : MonoBehaviour {
 
             // UIの配置
             cards[i].numUI.transform.position = cards[i].back.obj.transform.position;
+
         }
         numSetting = 0;
+
+        ////デバック用
+        //Getflag();
+
     }
 
     // 設定する際に使用するデータの更新
@@ -198,6 +202,7 @@ public class CardManagement : MonoBehaviour {
             posInterval = handsBordSize.x / numTypeHold;
 
         //isUpdateData = false;
+
     }
 
     // カード操作
@@ -212,27 +217,24 @@ public class CardManagement : MonoBehaviour {
                 // Rayに触れたオブジェクトをすべて取得
                 hit = mouse_system.GetReyhitObjects();
 
-                if (hit.Length > 0)
+                if (hit[hit.Length - 1].collider.tag == "Card")
                 {
-                    if (hit[hit.Length - 1].collider.tag == "Card")
+                    for (int i = 0; i < cards.Length; i++)
                     {
-                        for (int i = 0; i < cards.Length; i++)
+                        if (cards[i].front.obj != null)
                         {
-                            if (cards[i].front.obj != null)
+                            // Rayに触れているオブジェクトとボードのカードの座標が同じ
+                            if (hit[hit.Length - 1].transform.position == cards[i].front.obj.transform.position)
                             {
-                                // Rayに触れているオブジェクトとボードのカードの座標が同じ
-                                if (hit[hit.Length - 1].transform.position == cards[i].front.obj.transform.position)
-                                {
-                                    // はさむカードに設定
-                                    selectedCard = i;
-                                    tuckCard = cards[selectedCard];
-                                    break;
-                                }
+                                // はさむカードに設定
+                                selectedCard = i;
+                                tuckCard = cards[selectedCard];
+                                break;
                             }
                         }
-                        cursor = CursorForcusTag.ActtionBord;
-                        actionBord.GetComponent<CardBord>().selectedSpace = -1;
                     }
+                    cursor = CursorForcusTag.ActtionBord;
+                    actionBord.GetComponent<CardBord>().selectedSpace = -1;
                 }
             }
         }
@@ -274,11 +276,12 @@ public class CardManagement : MonoBehaviour {
                     {
                         for (int i = 0; i < bord.cards.Length; i++)
                         {
-                            if (!bord.cards[i].obj) continue;
                             //挟みたいカードとボードのカード座標が同じ
                             if (bord.cards[i].obj.transform.position == select_card.transform.position)
                             {
                                 bord.selectedSpace = i;
+
+                                GameObject.Find("Return").GetComponent<CardReturn>().SaveCard(bord.cards, cards);
 
                                 // 挟んだカードが同タイプ
                                 if (bord.GetCardType(bord.selectedSpace) == tuckCard.front.type
@@ -288,6 +291,7 @@ public class CardManagement : MonoBehaviour {
                                     CardBord.CardData newCard;
                                     newCard.type = DecideTuckCard(tuckCard.front.type, tuckCard.back.type);
                                     newCard.obj = null;
+                                    //新しいカードの生成
                                     CreateCards(ref newCard);
                                     if (newCard.obj != null)
                                     {
@@ -301,6 +305,7 @@ public class CardManagement : MonoBehaviour {
                                         bord.TuckCard(tuckCard.front, bord.selectedSpace);
                                         bord.TuckCard(tuckCard.back, bord.selectedSpace + 2);
                                     }
+                                    //カードの破棄
                                     Destroy(newCard.obj);
 
                                 }
@@ -348,15 +353,6 @@ public class CardManagement : MonoBehaviour {
                 case CardType.Attack:
                     card.obj = Instantiate(attackCard);
                     break;
-                case CardType.SuperMove:
-                    card.obj = Instantiate(superMoveCard);
-                    break;
-                case CardType.SuperJump:
-                    card.obj = Instantiate(superJumpCard);
-                    break;
-                case CardType.SuperAttack:
-                    card.obj = Instantiate(superAttackCard);
-                    break;
                 case CardType.Finish:
                     card.obj = Instantiate(finishCard);
                     break;
@@ -366,7 +362,7 @@ public class CardManagement : MonoBehaviour {
     }
 
     // カード破棄
-    void DestroyCards(ref CardBord.CardData card)
+    public void DestroyCards(ref CardBord.CardData card)
     {
             Destroy(card.obj);
     }
@@ -402,14 +398,8 @@ public class CardManagement : MonoBehaviour {
         switch ((int)type + (int)type1 * back)
         {
             // 仮
-            case (int)CardType.Move + (int)CardType.Move * back:
-                result = CardType.SuperMove;
-                break;
-            case (int)CardType.Jump + (int)CardType.Jump * back:
-                result = CardType.SuperJump;
-                break;
             case (int)CardType.Attack + (int)CardType.Attack * back:
-                result = CardType.SuperAttack;
+                result = CardType.Jump;
                 break;
             default:
                 result = CardType.Nothing;
@@ -437,5 +427,109 @@ public class CardManagement : MonoBehaviour {
             bord.usingCard = 0;
             return bord.GetCardType();
         }
+    }
+
+    //  カードの情報関係 /////////////////////////////////////////////////////////////////////////////////
+
+    // ボード情報を初期状態に戻す
+    public void ReturnBoard(ResetScript.INITDATA data)
+    {
+        // ActionBoardの情報を取得
+        CardBord bord = actionBord.GetComponent<CardBord>();
+
+        // カードの削除
+        for (int i = 0; i < bord.cards.Length; i++)
+        {
+            if (bord.cards[i].obj != null)
+                Destroy(bord.cards[i].obj);
+        }
+
+        // カードの再配置
+        bord.numSet = 0;
+        for (int i = 0; i < data.setCard.Length; i++)
+        {
+            switch (data.setCard[i].type)
+            {
+                case CardType.Move:
+                    bord.SetCard(Instantiate(moveCard), data.setCard[i].type);
+                    break;
+                case CardType.Jump:
+                    bord.SetCard(Instantiate(jumpCard), data.setCard[i].type);
+                    break;
+                case CardType.Attack:
+                    bord.SetCard(Instantiate(attackCard), data.setCard[i].type);
+                    break;
+                //case CardType.SuperMove:
+                //    bord.SetCard(Instantiate(superMoveCard), data.card[i].type);
+                //    break;
+                //case CardType.SuperJump:
+                //    bord.SetCard(Instantiate(superJumpCard), data.card[i].type);
+                //    break;
+                //case CardType.SuperAttack:
+                //    bord.SetCard(Instantiate(superAttackCard), data.card[i].type);
+                //    break;
+                case CardType.Finish:
+                    bord.SetCard(Instantiate(finishCard), data.setCard[i].type);
+                    break;
+                default:
+                    break;
+            }
+        }
+        bord.Coordinate();
+
+        // カード所持数を戻す
+        for (int i = 0; i < cards.Length; i++)
+            cards[i].numHold = data.cardNum[i];
+    }
+
+    // ボード情報を戻す関数のオーバーロード
+    public void ReturnBoard(CardReturn.DATA data)
+    {
+        // ActionBoardの情報を取得
+        CardBord bord = actionBord.GetComponent<CardBord>();
+
+        // カードの削除
+        for (int i = 0; i < bord.cards.Length; i++)
+        {
+            if (bord.cards[i].obj != null)
+                Destroy(bord.cards[i].obj);
+        }
+
+        // カードの再配置
+        bord.numSet = 0;
+        for (int i = 0; i < data.card.Length; i++)
+        {
+            switch (data.card[i].type)
+            {
+                case CardType.Move:
+                    bord.SetCard(Instantiate(moveCard), data.card[i].type);
+                    break;
+                case CardType.Jump:
+                    bord.SetCard(Instantiate(jumpCard), data.card[i].type);
+                    break;
+                case CardType.Attack:
+                    bord.SetCard(Instantiate(attackCard), data.card[i].type);
+                    break;
+                //case CardType.SuperMove:
+                //    bord.SetCard(Instantiate(superMoveCard), data.card[i].type);
+                //    break;
+                //case CardType.SuperJump:
+                //    bord.SetCard(Instantiate(superJumpCard), data.card[i].type);
+                //    break;
+                //case CardType.SuperAttack:
+                //    bord.SetCard(Instantiate(superAttackCard), data.card[i].type);
+                //    break;
+                case CardType.Finish:
+                    bord.SetCard(Instantiate(finishCard), data.card[i].type);
+                    break;
+                default:
+                    break;
+            }
+        }
+        bord.Coordinate();
+
+        // カード所持数を戻す
+        for (int i = 0; i < cards.Length; i++)
+            cards[i].numHold = data.cardNum[i];
     }
 }
