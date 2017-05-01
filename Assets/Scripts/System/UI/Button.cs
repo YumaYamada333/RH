@@ -87,10 +87,13 @@ public class Button : MonoBehaviour {
             //ResetButton.SetActive(true);
 
             // boardの配置
-            HandsBord.transform.position = new Vector3(1.0f, 1.0f, -10.0f);
-            ActionBord.transform.position = new Vector3(1.0f, 4.0f, -10.0f);
+            HandsBord.transform.position = new Vector3(1.0f, 1.0f, -4.0f);
+            ActionBord.transform.position = new Vector3(1.0f, 4.0f, -4.0f);
             //ActionBord.transform.localPosition = new Vector3(11.0f, 2.0f, 1.2f);
             //ActionBord.transform.localPosition += new Vector3(9.0f, 4.5f, 0.2f);
+
+            // HandsBoardを表示
+            HandsBord.SetActive(true);
         }
         else
         {
@@ -106,6 +109,9 @@ public class Button : MonoBehaviour {
             // actionbordの配置
             ActionBord.transform.position = new Vector3(0.05f, 0.05f, -3.0f) + mainCamera.transform.position - firstPos;
             //ActionBord.transform.localPosition -= new Vector3(9.0f, 4.5f, 0.2f);
+
+            // HandsBoardを非表示
+            HandsBord.SetActive(false);
         }
     }
 }
