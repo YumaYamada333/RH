@@ -73,9 +73,9 @@ public class ResetScript : MonoBehaviour
                     earlyCard[num].setCard[i].type = CardManagement.CardType.Nothing;
             }
 
-            // HandsBoardのカード所持数を保存
-            for (int j = 0; j < H_card.Length; j++)
-                earlyCard[num].cardNum[j] = H_card[j].numHold;
+            //// HandsBoardのカード所持数を保存
+            //for (int j = 0; j < H_card.Length; j++)
+            //    earlyCard[num].cardNum[j] = H_card[j].numHold;
 
             num++;
         }

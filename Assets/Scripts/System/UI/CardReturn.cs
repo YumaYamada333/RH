@@ -43,12 +43,12 @@ public class CardReturn : MonoBehaviour
 
     public void OnClick()
     {
-        // ひとつ前の情報が存在する
-        if (returnNum > 0 && cardData[returnNum - 1].card != null)
-        {
-            GameObject.Find("CardManager").GetComponent<CardManagement>().ReturnBoard(cardData[returnNum - 1]);
-            returnNum--;
-        }
+        //// ひとつ前の情報が存在する
+        //if (returnNum > 0 && cardData[returnNum - 1].card != null)
+        //{
+        //    GameObject.Find("CardManager").GetComponent<CardManagement>().ReturnBoard(cardData[returnNum - 1]);
+        //    returnNum--;
+        //}
     }
 
     // 現在のボード情報を保存
@@ -67,9 +67,9 @@ public class CardReturn : MonoBehaviour
                     cardData[returnNum].card[i].type = CardManagement.CardType.Nothing;
             }
 
-            // HandsBoardのカード所持数を保存
-            for (int j = 0; j < H_card.Length; j++)
-                cardData[returnNum].cardNum[j] = H_card[j].numHold;
+            //// HandsBoardのカード所持数を保存
+            //for (int j = 0; j < H_card.Length; j++)
+            //    cardData[returnNum].cardNum[j] = H_card[j].numHold;
 
             returnNum++;
         }
@@ -106,8 +106,8 @@ public class CardReturn : MonoBehaviour
                 cardData[cardData.Length - 1].card[i].type = CardManagement.CardType.Nothing;
         }
 
-        // HandsBoardのカード所持数を保存
-        for (int j = 0; j < H_card.Length; j++)
-            cardData[cardData.Length - 1].cardNum[j] = H_card[j].numHold;
+        //// HandsBoardのカード所持数を保存
+        //for (int j = 0; j < H_card.Length; j++)
+        //    cardData[cardData.Length - 1].cardNum[j] = H_card[j].numHold;
     }
 }

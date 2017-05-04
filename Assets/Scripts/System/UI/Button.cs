@@ -81,7 +81,7 @@ public class Button : MonoBehaviour {
             //リセットボタン
             ResetButton.SetActive(true);
             //リターンボタン
-            ReturnButton.SetActive(true);
+            //ReturnButton.SetActive(true);
             //RetuneButton.SetActive(true);
             //ResetButton.SetActive(true);
 
@@ -100,7 +100,7 @@ public class Button : MonoBehaviour {
             //リセットボタン
             ResetButton.SetActive(false);
             //リターンボタン
-            ReturnButton.SetActive(false);
+            //ReturnButton.SetActive(false);
 
             //RetuneButton.SetActive(false);
             //ResetButton.SetActive(false);

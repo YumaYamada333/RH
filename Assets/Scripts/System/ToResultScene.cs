@@ -34,7 +34,7 @@ public class ToResultScene : MonoBehaviour {
         switch (type)
         {
             case OverType.FALL:
-                player.GetComponent<PlayerAction>().AnimationStop();
+                //player.GetComponent<PlayerAction>().AnimationStop();
                 player.GetComponent<Animator>().SetBool("Over", true);
                 player.GetComponent<PlayerAction>().enabled = false;
                 break;
